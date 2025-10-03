@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { SendMoneyModal } from './SendMoneyModal';
 import { RequestMoneyModal } from './RequestMoneyModal';
 import { PayBillsModal } from './PayBillsModal';
+import { currency, transactionStyles, responsive, animations, layouts, dynamic } from '../utils/tailwind';
 
 export function Dashboard() {
   const [showBalance, setShowBalance] = useState(true);
@@ -31,7 +32,7 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="p-4 pb-20 space-y-6">
+    <div className={`${responsive.padding.page} space-y-6`}>
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -44,13 +45,13 @@ export function Dashboard() {
       </div>
 
       {/* Balance Card */}
-      <Card className="p-6 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
+      <Card className={`${responsive.padding.card} bg-gradient-to-r from-primary to-primary/90 text-primary-foreground ${animations.card}`}>
         <div className="flex justify-between items-start mb-4">
           <div>
             <p className="text-primary-foreground/70 mb-2">Total Balance</p>
             <div className="flex items-center gap-3">
-              <h2 className="text-3xl">
-                {showBalance ? `₦${balance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}` : '••••••'}
+              <h2 className={`text-3xl ${dynamic.balanceVisibility(showBalance)}`}>
+                {showBalance ? currency.format(balance, { showSign: false }) : '••••••'}
               </h2>
               <button
                 onClick={() => setShowBalance(!showBalance)}
@@ -66,11 +67,11 @@ export function Dashboard() {
         <div className="flex justify-between text-sm">
           <div>
             <p className="text-primary-foreground/70">Monthly Income</p>
-            <p className="text-green-300">+₦{monthlyIncome.toLocaleString('en-NG')}</p>
+            <p className="text-green-300">{currency.format(monthlyIncome)}</p>
           </div>
           <div className="text-right">
             <p className="text-primary-foreground/70">Monthly Expenses</p>
-            <p className="text-red-300">-₦{monthlyExpenses.toLocaleString('en-NG')}</p>
+            <p className="text-red-300">{currency.format(-monthlyExpenses)}</p>
           </div>
         </div>
       </Card>
@@ -78,7 +79,7 @@ export function Dashboard() {
       {/* Quick Actions */}
       <div>
         <h3 className="mb-4 text-foreground">Quick Actions</h3>
-        <div className="grid grid-cols-4 gap-4">
+        <div className={responsive.grid.actions}>
           {quickActions.map((action) => {
             const Icon = action.icon;
             
@@ -106,7 +107,7 @@ export function Dashboard() {
               <button
                 key={action.label}
                 onClick={handleQuickAction}
-                className="flex flex-col items-center p-4 rounded-xl bg-muted hover:bg-muted/80 active:scale-95 transition-all duration-150"
+                className={`flex flex-col items-center p-4 rounded-xl bg-muted hover:bg-muted/80 ${animations.button}`}
                 aria-label={action.label}
               >
                 <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mb-2`}>
@@ -128,13 +129,11 @@ export function Dashboard() {
           </Button>
         </div>
         
-        <div className="space-y-3">
+        <div className={responsive.grid.transactions}>
           {recentTransactions.map((transaction) => (
-            <div key={transaction.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div key={transaction.id} className={layouts.transactionItem}>
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  transaction.amount > 0 ? 'bg-green-100' : 'bg-gray-100'
-                }`}>
+                <div className={transactionStyles.iconContainer(transaction.amount)}>
                   <span className="text-sm">
                     {transaction.category === 'Income' ? '💰' : transaction.category === 'Food' ? '🛒' : transaction.category === 'Entertainment' ? '🎬' : '⛽'}
                   </span>
@@ -145,10 +144,8 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="text-right">
-                <p className={`font-medium ${
-                  transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {transaction.amount > 0 ? '+' : ''}₦{Math.abs(transaction.amount).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+                <p className={`font-medium ${transactionStyles.amount(transaction.amount, 'bold')}`}>
+                  {currency.format(transaction.amount)}
                 </p>
                 <p className="text-xs text-gray-500">{transaction.category}</p>
               </div>

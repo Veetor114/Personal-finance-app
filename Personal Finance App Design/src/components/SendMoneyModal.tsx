@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { currency, forms, animations } from '../utils/tailwind';
 
 interface SendMoneyModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export function SendMoneyModal({ isOpen, onClose }: SendMoneyModalProps) {
 
   const formatAmount = (value: string) => {
     const num = parseFloat(value.replace(/,/g, ''));
-    return isNaN(num) ? '' : num.toLocaleString();
+    return isNaN(num) ? '' : currency.display(num, 'compact');
   };
 
   return (
@@ -104,7 +105,7 @@ export function SendMoneyModal({ isOpen, onClose }: SendMoneyModalProps) {
             />
             {amount && (
               <p className="text-sm text-muted-foreground mt-1">
-                ₦{formatAmount(amount)}
+                Preview: {formatAmount(amount)}
               </p>
             )}
           </div>
@@ -132,7 +133,7 @@ export function SendMoneyModal({ isOpen, onClose }: SendMoneyModalProps) {
           </Button>
           <Button 
             onClick={handleSendMoney}
-            className="flex-1 bg-success hover:bg-success/90"
+            className={`flex-1 bg-success hover:bg-success/90 ${animations.button}`}
             disabled={isLoading}
           >
             {isLoading ? 'Sending...' : 'Send Money'}
